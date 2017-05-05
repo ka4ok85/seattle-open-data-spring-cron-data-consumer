@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: evgeny
+      comment: "Creating 'calls' table"
+      changes:
+        - createTable:
+            tableName: calls
+            columns:
+              - column:
+                  name: id
+                  type: int(11)
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: address
+                  type: varchar(1000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: incident_type
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: incident_number
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: latitude
+                  type: float(9,6)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: longitude
+                  type: float(9,6)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: datetime
+                  type: datetime
+                  constraints:
+                    nullable: false
