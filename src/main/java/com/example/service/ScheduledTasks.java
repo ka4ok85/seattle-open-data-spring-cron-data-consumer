@@ -25,6 +25,9 @@ public class ScheduledTasks {
     @Autowired
     private CallResource callResource;
 
+    
+
+    
     @Scheduled(fixedRate = 10000)
     public void reportCurrentTime() {
         log.info("Start API Call. The time is now {}", dateFormat.format(new Date()));
@@ -34,7 +37,7 @@ public class ScheduledTasks {
 			System.out.println(call);
 			callRepository.save(call);
 		}
-        
+
         log.info("End API Call. The time is now {}", dateFormat.format(new Date()));
     }
 }

@@ -11,10 +11,7 @@ import com.example.entity.*;
 
 @FeignClient(name = "911-calls-service", url = "https://data.seattle.gov/resource", configuration = FeignConfiguration.class)
 public interface CallResource {
-	
-	//@RequestMapping(method = RequestMethod.GET, value = "/author/{author}/addedValue/{addedValue}")
-    //Result addToTotal(@RequestParam(value="author") String author, @RequestParam(value="addedValue") long addedValue);
-	
-	@RequestMapping(method = RequestMethod.GET, value = "/fire-911.json?$limit=10&$order=datetime desc&$select=datetime,address,type,incident_number,latitude,longitude&$where=datetime is not null")
+
+	@RequestMapping(method = RequestMethod.GET, value = "/fire-911.json?$limit=10&$order=datetime desc&$select=datetime,address,type,incident_number,latitude,longitude&$where=datetime is not null", headers = "X-App-Token=${seattleopendata.token}")
     public List<Call> calls();
 }

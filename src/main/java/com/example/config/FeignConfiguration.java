@@ -20,4 +20,5 @@ public class FeignConfiguration {
     public Request.Options options() {
         return new Request.Options(FIVE_SECONDS, FIVE_SECONDS);
     }
+    
 }
