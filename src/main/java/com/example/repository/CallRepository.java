@@ -6,4 +6,5 @@ import com.example.entity.Call;
 
 public interface CallRepository extends JpaRepository<Call, Long> {
 
+	Call findTopByOrderByDatetimeDesc();
 }

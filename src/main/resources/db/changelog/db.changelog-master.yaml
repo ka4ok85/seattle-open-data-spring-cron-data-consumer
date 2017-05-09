@@ -18,7 +18,7 @@ databaseChangeLog:
                   name: address
                   type: varchar(1000)
                   constraints:
-                    nullable: false
+                    nullable: true
               - column:
                   name: incident_type
                   type: varchar(255)

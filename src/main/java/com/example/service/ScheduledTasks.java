@@ -1,6 +1,7 @@
 package com.example.service;
 
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -25,16 +26,19 @@ public class ScheduledTasks {
     @Autowired
     private CallResource callResource;
 
-    
-
-    
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 1000*3600)
     public void reportCurrentTime() {
         log.info("Start API Call. The time is now {}", dateFormat.format(new Date()));
         
-        List<Call> x = callResource.calls();
+        Call latestCall = callRepository.findTopByOrderByDatetimeDesc();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String latestCallDatetimeFormatted = latestCall.getDatetime().format(formatter);
+        log.info("Latest 911 Call Formatted Datetime is {}", latestCallDatetimeFormatted);
+        
+        List<Call> x = callResource.calls("datetime > '" + latestCallDatetimeFormatted + "'");
         for (Call call : x) {
-			System.out.println(call);
+        	log.info("Fetched Call Object {}", call);
 			callRepository.save(call);
 		}
 

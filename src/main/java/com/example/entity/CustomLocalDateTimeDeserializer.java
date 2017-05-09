@@ -31,8 +31,6 @@ public class CustomLocalDateTimeDeserializer extends StdScalarDeserializer<Local
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		String formattedDate = sdf.format(date);
 				
-		System.out.println(formattedDate);
-		
 		return LocalDateTime.parse(formattedDate);
 	}
 }
