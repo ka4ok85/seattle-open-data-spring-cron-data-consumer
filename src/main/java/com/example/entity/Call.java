@@ -11,6 +11,7 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Entity
 @Table(name="calls")
@@ -26,14 +27,15 @@ public class Call {
     private String type;
     
     @Column(name = "incident_number", unique = true)
-    @JsonProperty("incident_number")
     private String incidentNumber;
     
     private float latitude;
     
     private float longitude;
     
+
     @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
+    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
     private LocalDateTime datetime;
 
 	public Call() {
@@ -63,10 +65,12 @@ public class Call {
 		this.type = type;
 	}
 
+	@JsonProperty(value = "incidentNumber")
 	public String getIncidentNumber() {
 		return incidentNumber;
 	}
 
+	@JsonProperty(value = "incident_number")
 	public void setIncidentNumber(String incidentNumber) {
 		this.incidentNumber = incidentNumber;
 	}
