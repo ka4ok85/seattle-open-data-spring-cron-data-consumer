@@ -25,11 +25,13 @@ public class ScheduledTasks {
     
     @Autowired
     private CallResource callResource;
+    
+    @Autowired
+    private AMQPGateway aMQPGateway;
 
     @Scheduled(fixedRate = 1000*3600)
     public void reportCurrentTime() {
-        log.info("Start API Call. The time is now {}", dateFormat.format(new Date()));
-        
+    	/*
         Call latestCall = callRepository.findTopByOrderByDatetimeDesc();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -41,7 +43,14 @@ public class ScheduledTasks {
         	log.info("Fetched Call Object {}", call);
 			callRepository.save(call);
 		}
-
-        log.info("End API Call. The time is now {}", dateFormat.format(new Date()));
+		*/
+ 	   Call call = new Call();
+ 	   call.setIncidentNumber("test Incident Number");
+ 	   call.setType("test type");
+ 	   call.setAddress("test address");
+ 	   aMQPGateway.generate(call);
+       
+       
+       //aMQPGateway.generate(call.toString());
     }
 }

@@ -58,6 +58,10 @@
             <artifactId>spring-cloud-starter-feign</artifactId>
         </dependency>
         <dependency>
+   			<groupId>org.springframework.cloud</groupId>
+   			<artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+ 		</dependency>
+        <dependency>
     		<groupId>com.google.code.gson</groupId>
     		<artifactId>gson</artifactId>
 		</dependency>
@@ -67,6 +71,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -76,6 +81,14 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+	            <groupId>org.springframework.cloud</groupId>
+	            <artifactId>spring-cloud-stream-dependencies</artifactId>
+	            <version>Chelsea.SR2</version>
+	            <type>pom</type>
+	            <scope>import</scope>
+	        </dependency>
+            
         </dependencies>
     </dependencyManagement>
 	<build>
