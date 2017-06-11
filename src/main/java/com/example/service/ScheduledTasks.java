@@ -31,7 +31,7 @@ public class ScheduledTasks {
 
     @Scheduled(fixedRate = 1000*3600)
     public void reportCurrentTime() {
-    	/*
+
         Call latestCall = callRepository.findTopByOrderByDatetimeDesc();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -40,17 +40,16 @@ public class ScheduledTasks {
         
         List<Call> x = callResource.calls("datetime > '" + latestCallDatetimeFormatted + "'");
         for (Call call : x) {
-        	log.info("Fetched Call Object {}", call);
-			callRepository.save(call);
+        	log.info("Service: {}. Incident: {}. Fetched Call Object {}", "911-calls-cron-consumer", call.getIncidentNumber(), call);
+        	call = callRepository.save(call);
+        	aMQPGateway.generate(call);
 		}
-		*/
- 	   Call call = new Call();
- 	   call.setIncidentNumber("test Incident Number");
- 	   call.setType("test type");
- 	   call.setAddress("test address");
- 	   aMQPGateway.generate(call);
+
+    	
+    	
+ 	   //Call call = callRepository.findOne(50L);
+ 	   //aMQPGateway.generate(call);
        
-       
-       //aMQPGateway.generate(call.toString());
+
     }
 }
