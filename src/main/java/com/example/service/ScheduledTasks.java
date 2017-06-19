@@ -32,24 +32,37 @@ public class ScheduledTasks {
     @Scheduled(fixedRate = 1000*3600)
     public void reportCurrentTime() {
 
-        Call latestCall = callRepository.findTopByOrderByDatetimeDesc();
+    	Call latestCall = callRepository.findTopByOrderByDatetimeDesc();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String latestCallDatetimeFormatted = latestCall.getDatetime().format(formatter);
         log.info("Latest 911 Call Formatted Datetime is {}", latestCallDatetimeFormatted);
         
-        List<Call> x = callResource.calls("datetime > '" + latestCallDatetimeFormatted + "'");
-        for (Call call : x) {
-        	log.info("Service: {}. Incident: {}. Fetched Call Object {}", "911-calls-cron-consumer", call.getIncidentNumber(), call);
-        	call = callRepository.save(call);
-        	aMQPGateway.generate(call);
+        List<Call> callsList = callResource.calls("datetime > '" + latestCallDatetimeFormatted + "'");
+        for (Call call : callsList) {
+        	Call existingCall = callRepository.findByIncidentNumber(call.getIncidentNumber());
+        	if (existingCall == null) {
+            	log.info("Service: {}. Incident: {}. Fetched Call Object {}", "911-calls-cron-consumer", call.getIncidentNumber(), call);
+            	call = callRepository.save(call);
+            	aMQPGateway.generate(call);        		
+        	} else {
+        		// sometimes Open Data Service updates incident with updated details, but incident number is reserved initially
+        		log.info("Service: {}. Incident: {}. Fetched Duplicate Call Object {}", "911-calls-cron-consumer", existingCall.getIncidentNumber(), call);
+        		log.info("Service: {}. Incident: {}. Stored Duplicate Call Object {}", "911-calls-cron-consumer", existingCall.getIncidentNumber(), existingCall);
+				existingCall.setAddress(call.getAddress());
+				existingCall.setLatitude(call.getLatitude());
+				existingCall.setLongitude(call.getLongitude());
+				existingCall.setType(call.getType());
+				log.info("Service: {}. Incident: {}. Updated Call Object {}", "911-calls-cron-consumer", existingCall.getIncidentNumber(), existingCall);
+				callRepository.save(existingCall);
+        		// we don't want to send again existing call details
+        	}
 		}
-
     	
-    	
- 	   //Call call = callRepository.findOne(50L);
+/*
+ 	   Call call = callRepository.findOne(50L);
  	   //aMQPGateway.generate(call);
-       
 
+*/ 	   
     }
 }
