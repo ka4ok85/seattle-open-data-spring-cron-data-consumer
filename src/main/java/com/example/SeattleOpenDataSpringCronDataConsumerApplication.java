@@ -15,8 +15,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 )
 public class SeattleOpenDataSpringCronDataConsumerApplication {
 	
-
-	
 	public static void main(String[] args) {
 		SpringApplication.run(SeattleOpenDataSpringCronDataConsumerApplication.class, args);
 	}
