@@ -1,8 +1,6 @@
 package com.example.service;
 
-import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -21,8 +19,6 @@ import feign.FeignException;
 public class ScheduledTasks {
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-    
     @Value("${service.name}")
     private String serviceName;
     
@@ -53,14 +49,12 @@ public class ScheduledTasks {
 	            	call = callRepository.save(call);
 	            	aMQPGateway.generate(call);        		
 	        	} else {
-	        		// sometimes Open Data Service updates incident with updated details, but incident number is reserved initially
+	        		// sometimes Open Data Service returns same incident twice
 	        		log.info("Service: {}. Incident: {}. Fetched Duplicate Call Object {}", serviceName, existingCall.getIncidentNumber(), call);
-	        		log.info("Service: {}. Incident: {}. Stored Duplicate Call Object {}", serviceName, existingCall.getIncidentNumber(), existingCall);
 					existingCall.setAddress(call.getAddress());
 					existingCall.setLatitude(call.getLatitude());
 					existingCall.setLongitude(call.getLongitude());
 					existingCall.setType(call.getType());
-					log.info("Service: {}. Incident: {}. Updated Call Object {}", serviceName, existingCall.getIncidentNumber(), existingCall);
 					callRepository.save(existingCall);
 	        		// we don't want to send again existing call details
 	        	}
