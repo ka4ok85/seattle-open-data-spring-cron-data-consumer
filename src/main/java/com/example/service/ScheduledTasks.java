@@ -13,60 +13,52 @@ import org.springframework.stereotype.Component;
 import com.example.entity.Call;
 import com.example.repository.CallRepository;
 
-import feign.FeignException;
-
 @Component
 public class ScheduledTasks {
-    private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
+	private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
 
-    @Value("${service.name}")
-    private String serviceName;
-    
-    @Autowired
-    private CallRepository callRepository;
-    
-    @Autowired
-    private CallResource callResource;
-    
-    @Autowired
-    private AMQPGateway aMQPGateway;
+	@Value("${service.name}")
+	private String serviceName;
 
-    @Scheduled(fixedRate = 1000*3600)
-    public void reportCurrentTime() {
+	@Autowired
+	private CallRepository callRepository;
 
-    	Call latestCall = callRepository.findTopByOrderByDatetimeDesc();
+	@Autowired
+	private CallResource callResource;
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String latestCallDatetimeFormatted = latestCall.getDatetime().format(formatter);
-        log.info("Service: {}. Latest 911 Call Formatted Datetime is {}", serviceName, latestCallDatetimeFormatted);
+	@Autowired
+	private AMQPGateway aMQPGateway;
 
-        try {
-	        List<Call> callsList = callResource.calls("datetime > '" + latestCallDatetimeFormatted + "'");
-	        for (Call call : callsList) {
-	        	Call existingCall = callRepository.findByIncidentNumber(call.getIncidentNumber());
-	        	if (existingCall == null) {
-	            	log.info("Service: {}. Incident: {}. Fetched Call Object {}", serviceName, call.getIncidentNumber(), call);
-	            	call = callRepository.save(call);
-	            	aMQPGateway.generate(call);        		
-	        	} else {
-	        		// sometimes Open Data Service returns same incident twice
-	        		log.info("Service: {}. Incident: {}. Fetched Duplicate Call Object {}", serviceName, existingCall.getIncidentNumber(), call);
-					existingCall.setAddress(call.getAddress());
-					existingCall.setLatitude(call.getLatitude());
-					existingCall.setLongitude(call.getLongitude());
-					existingCall.setType(call.getType());
-					callRepository.save(existingCall);
-	        		// we don't want to send again existing call details
-	        	}
+	@Scheduled(fixedRate = 1000 * 3600)
+	public void reportCurrentTime() {
+
+		Call latestCall = callRepository.findTopByOrderByDatetimeDesc();
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		String latestCallDatetimeFormatted = latestCall.getDatetime().format(formatter);
+		log.info("Service: {}. Latest 911 Call Formatted Datetime is {}", serviceName, latestCallDatetimeFormatted);
+
+		List<Call> callsList = callResource.calls("datetime > '" + latestCallDatetimeFormatted + "'");
+		for (Call call : callsList) {
+			Call existingCall = callRepository.findByIncidentNumber(call.getIncidentNumber());
+			if (existingCall == null) {
+				log.info("Service: {}. Incident: {}. Fetched Call Object {}", serviceName, call.getIncidentNumber(), call);
+				call = callRepository.save(call);
+				aMQPGateway.generate(call);
+			} else {
+				// sometimes Open Data Service returns same incident twice
+				log.info("Service: {}. Incident: {}. Fetched Duplicate Call Object {}", serviceName, existingCall.getIncidentNumber(), call);
+				existingCall.setAddress(call.getAddress());
+				existingCall.setLatitude(call.getLatitude());
+				existingCall.setLongitude(call.getLongitude());
+				existingCall.setType(call.getType());
+				callRepository.save(existingCall);
+				// we don't want to send existing call details again
 			}
-        } catch (FeignException e) {
-        	log.error("Service: {}. Can not fetch data from: {}", serviceName, e.getMessage());
 		}
-    	
-/*
- 	   Call call = callRepository.findOne(50L);
- 	   //aMQPGateway.generate(call);
 
-*/ 	   
-    }
+		/*
+		 * Call call = callRepository.findOne(50L); aMQPGateway.generate(call);
+		 */
+	}
 }
