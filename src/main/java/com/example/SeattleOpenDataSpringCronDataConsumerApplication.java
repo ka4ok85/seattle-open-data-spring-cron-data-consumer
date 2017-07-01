@@ -5,11 +5,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableFeignClients
 @EnableScheduling
+@EnableRetry
 @EntityScan(
         basePackageClasses = {SeattleOpenDataSpringCronDataConsumerApplication.class, Jsr310JpaConverters.class}
 )
