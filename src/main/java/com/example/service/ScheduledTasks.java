@@ -31,14 +31,17 @@ public class ScheduledTasks {
 
 	@Scheduled(fixedRate = 1000 * 3600)
 	public void reportCurrentTime() {
-
 		Call latestCall = callRepository.findTopByOrderByDatetimeDesc();
-
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		String latestCallDatetimeFormatted = latestCall.getDatetime().format(formatter);
 		log.info("Service: {}. Latest 911 Call Formatted Datetime is {}", serviceName, latestCallDatetimeFormatted);
 
 		List<Call> callsList = callResource.calls("datetime > '" + latestCallDatetimeFormatted + "'");
+		if (callsList.size() == 0) {
+			log.info("Service: {}. No new 911 calls", serviceName);
+			return;
+		}
+
 		for (Call call : callsList) {
 			Call existingCall = callRepository.findByIncidentNumber(call.getIncidentNumber());
 			if (existingCall == null) {
