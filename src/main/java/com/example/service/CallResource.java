@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.config.FeignConfiguration;
 import com.example.entity.*;
 
-@FeignClient(name = "911-calls-service", url = "https://data.seattle.gov/resource", configuration = FeignConfiguration.class, fallback = CallFallback.class)
+@FeignClient(name = "911-calls-service", url = "https://data.seattle.gov/resource", configuration = FeignConfiguration.class)
 public interface CallResource {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/fire-911.json?$limit=50&$order=datetime desc&$select=datetime,address,type,incident_number,latitude,longitude", headers = "X-App-Token=${seattleopendata.token}")
