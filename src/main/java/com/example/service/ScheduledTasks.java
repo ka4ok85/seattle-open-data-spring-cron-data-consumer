@@ -24,7 +24,7 @@ public class ScheduledTasks {
 	private CallRepository callRepository;
 
 	@Autowired
-	private CallResource callResource;
+	private RetryCallService retryCallService;
 
 	@Autowired
 	private AMQPGateway aMQPGateway;
@@ -36,7 +36,7 @@ public class ScheduledTasks {
 		String latestCallDatetimeFormatted = latestCall.getDatetime().format(formatter);
 		log.info("Service: {}. Latest 911 Call Formatted Datetime is {}", serviceName, latestCallDatetimeFormatted);
 
-		List<Call> callsList = callResource.calls("datetime > '" + latestCallDatetimeFormatted + "'");
+		List<Call> callsList = retryCallService.requestCalls("datetime > '" + latestCallDatetimeFormatted + "'");
 		if (callsList.size() == 0) {
 			log.info("Service: {}. No new 911 calls", serviceName);
 			return;
